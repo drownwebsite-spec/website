@@ -5,4 +5,8 @@
   [deploy]
   startCommand = "node --enable-source-maps ./artifacts/api-server/dist/index.mjs"
   healthcheckPath = "/api/healthz"
+
+  # Automatically push DB schema changes before each deploy.
+  # Requires DATABASE_URL and JWT_SECRET to be set in Railway environment variables.
+  releaseCommand = "pnpm --filter @workspace/db run push"
   
