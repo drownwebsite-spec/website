@@ -1,7 +1,125 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { SiDiscord, SiTiktok, SiX, SiTelegram } from "react-icons/si";
-import { Check, Eye, Users, File, Gem, ChevronDown, X } from "lucide-react";
+import { Check, Eye, Users, File, Gem, ChevronDown, ChevronUp, X } from "lucide-react";
+
+const LANGUAGES = [
+  { flag: "🇺🇸", label: "English", region: "United States", code: "en" },
+  { flag: "🇪🇸", label: "Español", region: "España", code: "es" },
+  { flag: "🇧🇷", label: "Português", region: "Brasil", code: "pt" },
+  { flag: "🇫🇷", label: "Français", region: "France", code: "fr" },
+  { flag: "🇩🇪", label: "Deutsch", region: "Deutschland", code: "de" },
+  { flag: "🇹🇷", label: "Türkçe", region: "Türkiye", code: "tr" },
+  { flag: "🇷🇺", label: "Русский", region: "Россия", code: "ru" },
+  { flag: "🇸🇦", label: "العربية", region: "السعودية", code: "ar" },
+];
+
+function MobileMenuOverlay({ onClose, navigate }: { onClose: () => void; navigate: (path: string) => void }) {
+  const [langOpen, setLangOpen] = useState(false);
+  const [selectedLang, setSelectedLang] = useState(LANGUAGES[0]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col font-['Inter']" style={{ background: "#0b0b0b" }} data-testid="mobile-menu">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-4 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <svg className="w-7 h-4 text-purple-500" viewBox="0 0 120 60" fill="currentColor">
+            <path d="M110 20H95V15C95 13.3 93.7 12 92 12H28C26.3 12 25 13.3 25 15V20H10C8.3 20 7 21.3 7 23V33C7 34.7 8.3 36 10 36H25V40C25 42.2 26.8 44 29 44H36V52C36 53.1 36.9 54 38 54H50C51.1 54 52 53.1 52 52V44H92C94.2 44 96 42.2 96 40V36H110C111.7 36 113 34.7 113 33V23C113 21.3 111.7 20 110 20Z" />
+          </svg>
+          <span className="font-bold text-white text-base tracking-tight">guns.lol</span>
+        </div>
+        <button onClick={onClose} data-testid="button-close-menu" style={{ color: "#a78bfa" }}>
+          <X size={22} />
+        </button>
+      </div>
+
+      {/* Nav links */}
+      <div className="px-4 space-y-2 flex-shrink-0">
+        {[
+          { label: "Help Center", action: () => { onClose(); navigate("/help"); } },
+          { label: "Discord",     action: () => { onClose(); } },
+          { label: "Leaderboard", action: () => { onClose(); } },
+          { label: "Pricing",     action: () => { onClose(); document.getElementById("pricing-section")?.scrollIntoView({ behavior: "smooth" }); } },
+        ].map(item => (
+          <button
+            key={item.label}
+            onClick={item.action}
+            data-testid={`link-mobile-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+            className="w-full text-left px-4 py-3.5 rounded-2xl text-sm text-white transition-colors"
+            style={{ background: "#1a1a1a", border: "1px solid #2a2a2a" }}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* Language selector + auth */}
+      <div className="px-4 pb-8 space-y-2 flex-shrink-0">
+        {/* Language dropdown */}
+        <div className="rounded-2xl overflow-hidden" style={{ background: "#1a1a1a", border: "1px solid #2a2a2a" }}>
+          {/* Expanded list */}
+          {langOpen && (
+            <div className="border-b" style={{ borderColor: "#2a2a2a" }}>
+              {LANGUAGES.map(lang => (
+                <button
+                  key={lang.code}
+                  onClick={() => { setSelectedLang(lang); setLangOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors"
+                  style={{
+                    background: lang.code === selectedLang.code ? "#252525" : "transparent",
+                    color: lang.code === selectedLang.code ? "#fff" : "#aaa",
+                    borderBottom: "1px solid #222",
+                  }}
+                >
+                  <span>{lang.flag}</span>
+                  <span>{lang.label}</span>
+                  <span style={{ color: "#555" }}>({lang.region})</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {/* Current language toggle */}
+          <button
+            onClick={() => setLangOpen(v => !v)}
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white"
+            data-testid="button-language-toggle"
+          >
+            <span>{selectedLang.flag}</span>
+            <span className="flex-1 text-left">{selectedLang.label} (US)</span>
+            {langOpen ? <ChevronUp size={16} style={{ color: "#666" }} /> : <ChevronDown size={16} style={{ color: "#666" }} />}
+          </button>
+        </div>
+
+        {/* Login */}
+        <button
+          data-testid="button-login-mobile"
+          onClick={() => { onClose(); navigate("/login"); }}
+          className="w-full text-left px-4 py-3.5 rounded-2xl text-sm"
+          style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", color: "#ccc" }}
+        >
+          Login
+        </button>
+
+        {/* Sign Up Free */}
+        <button
+          data-testid="button-sign-up-mobile"
+          onClick={() => { onClose(); navigate("/signup"); }}
+          className="w-full text-white font-semibold py-3.5 rounded-full text-sm transition-all hover:opacity-90"
+          style={{ background: "#5b21b6" }}
+        >
+          Sign Up Free
+        </button>
+
+        <p className="text-xs text-center pt-1" style={{ color: "#333" }}>
+          We collect only the information needed to provide our services.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function GunSVG({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
@@ -207,7 +325,8 @@ export default function Home() {
                 data-testid={`link-nav-${item.toLowerCase().replace(/\s+/g, '-')}`}
                 onClick={e => {
                   e.preventDefault();
-                  if (item === "Pricing") document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
+                  if (item === "Help Center") navigate("/help");
+                  else if (item === "Pricing") document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
                 }}
                 className="text-sm font-medium transition-colors"
                 style={{ color: "#999" }}
@@ -241,60 +360,18 @@ export default function Home() {
           <button
             data-testid="button-menu-toggle"
             className="md:hidden flex flex-col gap-[5px] p-1"
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={() => setMenuOpen(true)}
             aria-label="Menu"
           >
-            {menuOpen ? (
-              <X size={20} style={{ color: "#a78bfa" }} />
-            ) : (
-              <>
-                <div className="w-5 h-[2px] rounded" style={{ background: "#a78bfa" }} />
-                <div className="w-5 h-[2px] rounded" style={{ background: "#a78bfa" }} />
-                <div className="w-5 h-[2px] rounded" style={{ background: "#a78bfa" }} />
-              </>
-            )}
+            <div className="w-5 h-[2px] rounded" style={{ background: "#a78bfa" }} />
+            <div className="w-5 h-[2px] rounded" style={{ background: "#a78bfa" }} />
+            <div className="w-5 h-[2px] rounded" style={{ background: "#a78bfa" }} />
           </button>
         </nav>
-
-        {/* Mobile dropdown */}
-        {menuOpen && (
-          <div
-            data-testid="mobile-menu"
-            className="mt-1.5 rounded-2xl overflow-hidden"
-            style={{ background: "#111111" }}
-          >
-            <div className="p-4 space-y-0.5">
-              {["Help Center", "Discord", "Leaderboard", "Pricing", "Login"].map(item => (
-                <a
-                  key={item}
-                  href="#"
-                  data-testid={`link-mobile-${item.toLowerCase().replace(/\s+/g, '-')}`}
-                  onClick={e => {
-                    e.preventDefault();
-                    setMenuOpen(false);
-                    if (item === "Login") navigate("/login");
-                    else if (item === "Pricing") document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="block py-2.5 px-3 rounded-xl text-sm transition-colors"
-                  style={{ color: "#aaa" }}
-                >
-                  {item}
-                </a>
-              ))}
-              <div className="pt-2">
-                <button
-                  data-testid="button-sign-up-mobile"
-                  onClick={() => { setMenuOpen(false); navigate("/signup"); }}
-                  className="w-full text-white font-semibold py-2.5 rounded-full text-sm transition-all"
-                  style={{ background: "#5b21b6" }}
-                >
-                  Sign Up Free
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Mobile full-screen overlay */}
+      {menuOpen && <MobileMenuOverlay onClose={() => setMenuOpen(false)} navigate={navigate} />}
 
       {/* ── HERO ── */}
       <section className="relative z-10 pt-14 pb-16 px-5 text-center" data-testid="hero-section">
