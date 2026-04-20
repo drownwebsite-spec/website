@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import Profile from "@/pages/Profile";
 import SignUp from "@/pages/SignUp";
 import Login from "@/pages/Login";
+import Help from "@/pages/Help";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/signup" component={SignUp} />
       <Route path="/login" component={Login} />
+      <Route path="/help" component={Help} />
       <Route path="/:username" component={ProfileWrapper} />
       <Route component={NotFound} />
     </Switch>
